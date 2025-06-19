@@ -1,0 +1,102 @@
+<div class="todo-app">
+  <header class="todo-header">
+    <h1>Todo App Angular</h1>
+    <div class="stats">
+      <span class="stat">Total: {{todos.length}}</span>
+      <span class="stat pending">En cours: {{pendingCount}}</span>
+      <span class="stat completed">Terminées: {{completedCount}}</span>
+    </div>
+  </header>
+
+  <div class="todo-form">
+    <input
+      type="text"
+      [(ngModel)]="newTodoTitle"
+      (keyup.enter)="addTodo()"
+      placeholder="Ajouter une nouvelle tâche ...."
+      class="todo-input">
+    <button
+      (click)="addTodo()"
+      [disabled]="!newTodoTitle.trim()"
+      class="add-btn">
+      Ajouter
+    </button>
+  </div>
+
+  <div class="filter-tabs">
+    <button
+      *ngFor="let filter of filters"
+      (click)="currentFilter = filter.value"
+      [class.active]="currentFilter === filter.value"
+      class="filter-btn">
+      {{filter.label}}
+    </button>
+  </div>
+
+  <div class="todo-list">
+    <div
+      *ngFor="let todo of getFilteredTodos(); trackBy: trackByTodo"
+      class="todo-item"
+      [class.completed]="todo.completed">
+
+      <input
+        type="checkbox"
+        [checked]="todo.completed"
+        (change)="toggleTodo(todo.id)"
+        class="todo-checkbox">
+
+      <div class="todo-content" (dblclick)="startEdit(todo)">
+        <span
+          *ngIf="editingTodo !== todo.id"
+          class="todo-title"
+          [class.completed-text]="todo.completed">
+          {{todo.title}}
+        </span>
+
+        <input
+          *ngIf="editingTodo === todo.id"
+          type="text"
+          [(ngModel)]="editingTitle"
+          (keyup.enter)="saveEdit(todo.id)"
+          (keyup.escape)="cancelEdit()"
+          (blur)="saveEdit(todo.id)"
+          class="edit-input"
+          #editInput>
+      </div>
+
+      <div class="todo-actions">
+        <button
+          (click)="startEdit(todo)"
+          class="edit-btn"
+          title="Modifier">
+          ✏️
+        </button>
+        <button
+          (click)="deleteTodo(todo.id)"
+          class="delete-btn"
+          title="Supprimer">
+          🗑️
+        </button>
+      </div>
+
+      <div class="todo-date">
+        {{todo.createdAt | date:'dd/MM/yyyy HH:mm'}}
+      </div>
+    </div>
+
+    <div *ngIf="getFilteredTodos().length === 0" class="empty-state">
+      <p *ngIf="currentFilter === 'all'">Aucune tâche pour le moment</p>
+      <p *ngIf="currentFilter === 'pending'">Aucune tâche en cours</p>
+      <p *ngIf="currentFilter === 'completed'">Aucune tâche terminée</p>
+    </div>
+  </div>
+
+  <div class="todo-footer" *ngIf="todos.length > 0">
+    <button
+      (click)="clearCompleted()"
+      [disabled]="completedCount === 0"
+      class="clear-btn">
+      Supprimer les tâches terminées ({{completedCount}})
+    </button>
+  </div>
+</div>
